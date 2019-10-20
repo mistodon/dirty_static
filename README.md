@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/mistodon/dirty_static.svg?branch=master)](https://travis-ci.org/mistodon/dirty_static)
 [![Crates.io](https://img.shields.io/crates/v/dirty_static.svg)](https://crates.io/crates/dirty_static)
-[![Docs.rs](https://docs.rs/resource/badge.svg)](https://docs.rs/dirty_static/0.1.0/dirty_static/)
+[![Docs.rs](https://docs.rs/dirty_static/badge.svg)](https://docs.rs/dirty_static/0.1.0/dirty_static/)
 
 This crate provides a container for a value, `DirtyStatic`, which
 allows mutation in debug mode (via `UnsafeCell`), but not in
