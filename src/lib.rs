@@ -1,6 +1,10 @@
-//! This crate primarily provides the `DirtyConst` struct, which is
-//! a container for an immutable value, which can in fact be mutated
-//! in debug mode.
+//! This crate provides a container for a value, `DirtyConst`, which
+//! allows mutation in debug mode (via `UnsafeCell`), but not in
+//! release mode.
+//!
+//! This allows you to tweak data while testing an application,
+//! without having that data be mutable when the application is
+//! released.
 //!
 //! There are also two features available:
 //!
@@ -22,8 +26,8 @@ mod internal {
     use std::cell::UnsafeCell;
     use std::ops::Deref;
 
-    /// A container for an immutable value, that allows interior
-    /// mutation in debug mode only. (Or enabled via `force-dynamic`
+    /// A container for a value which allows interior mutation
+    /// only in debug mode. (Or when enabled via `force-dynamic`
     /// feature.)
     pub struct DirtyConst<T>(UnsafeCell<T>);
     unsafe impl<T> Sync for DirtyConst<T> where T: Sync {}
@@ -58,13 +62,28 @@ mod internal {
         ///
         /// # Examples
         ///
-        /// ```rust
+        /// ```rust,no_run
+        /// // In debug mode
         /// use dirty_const::DirtyConst;
         ///
         /// let c = DirtyConst::new(100);
         /// unsafe {
         ///     c.replace(200);
         /// }
+        ///
+        /// assert_eq!(*c, 200);
+        /// ```
+        ///
+        /// ```rust,no_run
+        /// // In release mode
+        /// use dirty_const::DirtyConst;
+        ///
+        /// let c = DirtyConst::new(100);
+        /// unsafe {
+        ///     c.replace(200);
+        /// }
+        ///
+        /// assert_eq!(*c, 100);
         /// ```
         pub unsafe fn replace(&self, t: T) {
             let ptr = self.0.get();
