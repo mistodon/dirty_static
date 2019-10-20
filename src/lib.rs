@@ -1,3 +1,14 @@
+//! This crate primarily provides the `DirtyConst` struct, which is
+//! a container for an immutable value, which can in fact be mutated
+//! in debug mode.
+//!
+//! There are also two features available:
+//!
+//! 1. `force-dynamic` which allows replacing the value of a
+//!     `DirtyConst` even in release mode.
+//! 2. `force-static` which disallows replacing the value of a
+//!     `DirtyConst` even in debug mode.
+
 #[cfg(all(feature = "force-static", feature = "force-dynamic"))]
 compile_error!("dirty_const: Cannot enable both the force-static and force-dynamic features.");
 
@@ -11,6 +22,9 @@ mod internal {
     use std::cell::UnsafeCell;
     use std::ops::Deref;
 
+    /// A container for an immutable value, that allows interior
+    /// mutation in debug mode only. (Or enabled via `force-dynamic`
+    /// feature.)
     pub struct DirtyConst<T>(UnsafeCell<T>);
     unsafe impl<T> Sync for DirtyConst<T> where T: Sync {}
 
@@ -24,10 +38,34 @@ mod internal {
     }
 
     impl<T> DirtyConst<T> {
+        /// Create a new DirtyConst with the given interior value.
+        ///
+        /// # Examples
+        ///
+        /// ```rust
+        /// use dirty_const::DirtyConst;
+        ///
+        /// let c = DirtyConst::new(100);
+        /// assert_eq!(*c, 100);
+        /// ```
         pub const fn new(t: T) -> Self {
             DirtyConst(UnsafeCell::new(t))
         }
 
+        /// Replace the interior value of the DirtyConst. Note that
+        /// this will do nothing unless running in debug mode, or
+        /// enabling the `force-dynamic` feature.
+        ///
+        /// # Examples
+        ///
+        /// ```rust
+        /// use dirty_const::DirtyConst;
+        ///
+        /// let c = DirtyConst::new(100);
+        /// unsafe {
+        ///     c.replace(200);
+        /// }
+        /// ```
         pub unsafe fn replace(&self, t: T) {
             let ptr = self.0.get();
             *ptr = t
