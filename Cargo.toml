@@ -1,17 +1,23 @@
 [package]
-name = "dirty_const"
+name = "dirty_static"
 version = "0.1.0"
 authors = ["Claire Harris <wishing.engine@gmail.com>"]
+edition = "2018"
 description = """
 A container for an immutable value that allows sneaky reloading in debug mode (via UnsafeCell) while keeping the data safe and constant in release mode.
 
 This allows you to tweak data while testing an application, without having that data be mutable when the application is released.
+
+Intended for use with game assets, but suitable for any interactive application.
 """
-repository = "https://github.com/mistodon/dirty_const"
+repository = "https://github.com/mistodon/dirty_static"
 readme = "README.md"
-categories = ["games"]
+keywords = ["mutable", "static", "debug", "release", "const"]
+categories = ["config", "data-structures", "development-tools", "games"]
 license = "CC0-1.0"
-edition = "2018"
+
+[badges]
+travis-ci = { repository = "mistodon/dirty_static", branch = "master" }
 
 [dependencies]
 

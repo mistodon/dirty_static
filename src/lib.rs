@@ -1,4 +1,4 @@
-//! This crate provides a container for a value, `DirtyConst`, which
+//! This crate provides a container for a value, `DirtyStatic`, which
 //! allows mutation in debug mode (via `UnsafeCell`), but not in
 //! release mode.
 //!
@@ -9,14 +9,14 @@
 //! There are also two features available:
 //!
 //! 1. `force-dynamic` which allows replacing the value of a
-//!     `DirtyConst` even in release mode.
+//!     `DirtyStatic` even in release mode.
 //! 2. `force-static` which disallows replacing the value of a
-//!     `DirtyConst` even in debug mode.
+//!     `DirtyStatic` even in debug mode.
 
 #[cfg(all(feature = "force-static", feature = "force-dynamic"))]
-compile_error!("dirty_const: Cannot enable both the force-static and force-dynamic features.");
+compile_error!("dirty_static: Cannot enable both the force-static and force-dynamic features.");
 
-pub use internal::DirtyConst;
+pub use internal::DirtyStatic;
 
 #[cfg(any(
     feature = "force-dynamic",
@@ -29,10 +29,10 @@ mod internal {
     /// A container for a value which allows interior mutation
     /// only in debug mode. (Or when enabled via `force-dynamic`
     /// feature.)
-    pub struct DirtyConst<T>(UnsafeCell<T>);
-    unsafe impl<T> Sync for DirtyConst<T> where T: Sync {}
+    pub struct DirtyStatic<T>(UnsafeCell<T>);
+    unsafe impl<T> Sync for DirtyStatic<T> where T: Sync {}
 
-    impl<T> Deref for DirtyConst<T> {
+    impl<T> Deref for DirtyStatic<T> {
         type Target = T;
 
         fn deref(&self) -> &Self::Target {
@@ -41,22 +41,22 @@ mod internal {
         }
     }
 
-    impl<T> DirtyConst<T> {
-        /// Create a new DirtyConst with the given interior value.
+    impl<T> DirtyStatic<T> {
+        /// Create a new DirtyStatic with the given interior value.
         ///
         /// # Examples
         ///
         /// ```rust
-        /// use dirty_const::DirtyConst;
+        /// use dirty_static::DirtyStatic;
         ///
-        /// let c = DirtyConst::new(100);
+        /// let c = DirtyStatic::new(100);
         /// assert_eq!(*c, 100);
         /// ```
         pub const fn new(t: T) -> Self {
-            DirtyConst(UnsafeCell::new(t))
+            DirtyStatic(UnsafeCell::new(t))
         }
 
-        /// Replace the interior value of the DirtyConst. Note that
+        /// Replace the interior value of the DirtyStatic. Note that
         /// this will do nothing unless running in debug mode, or
         /// enabling the `force-dynamic` feature.
         ///
@@ -64,9 +64,9 @@ mod internal {
         ///
         /// ```rust,no_run
         /// // In debug mode
-        /// use dirty_const::DirtyConst;
+        /// use dirty_static::DirtyStatic;
         ///
-        /// let c = DirtyConst::new(100);
+        /// let c = DirtyStatic::new(100);
         /// unsafe {
         ///     c.replace(200);
         /// }
@@ -76,9 +76,9 @@ mod internal {
         ///
         /// ```rust,no_run
         /// // In release mode
-        /// use dirty_const::DirtyConst;
+        /// use dirty_static::DirtyStatic;
         ///
-        /// let c = DirtyConst::new(100);
+        /// let c = DirtyStatic::new(100);
         /// unsafe {
         ///     c.replace(200);
         /// }
@@ -98,7 +98,7 @@ mod internal {
         #[test]
         fn create_value() {
             let text = "Hello".to_string();
-            let c = DirtyConst::new(text);
+            let c = DirtyStatic::new(text);
 
             assert_eq!(&*c, "Hello");
         }
@@ -106,7 +106,7 @@ mod internal {
         #[test]
         fn refresh_value() {
             let text = "Hello".to_string();
-            let c = DirtyConst::new(text);
+            let c = DirtyStatic::new(text);
 
             unsafe { c.replace("Replacement value".to_string()) };
             assert_eq!(&*c, "Replacement value");
@@ -121,9 +121,9 @@ mod internal {
 mod internal {
     use std::ops::Deref;
 
-    pub struct DirtyConst<T>(T);
+    pub struct DirtyStatic<T>(T);
 
-    impl<T> Deref for DirtyConst<T> {
+    impl<T> Deref for DirtyStatic<T> {
         type Target = T;
 
         fn deref(&self) -> &Self::Target {
@@ -131,9 +131,9 @@ mod internal {
         }
     }
 
-    impl<T> DirtyConst<T> {
+    impl<T> DirtyStatic<T> {
         pub const fn new(t: T) -> Self {
-            DirtyConst(t)
+            DirtyStatic(t)
         }
 
         pub unsafe fn replace(&self, _t: T) {
@@ -148,7 +148,7 @@ mod internal {
         #[test]
         fn create_value() {
             let text = "Hello".to_string();
-            let c = DirtyConst::new(text);
+            let c = DirtyStatic::new(text);
 
             assert_eq!(&*c, "Hello");
         }
@@ -156,7 +156,7 @@ mod internal {
         #[test]
         fn refresh_value_does_nothing() {
             let text = "Hello".to_string();
-            let c = DirtyConst::new(text);
+            let c = DirtyStatic::new(text);
 
             unsafe { c.replace("Replacement value".to_string()) };
             assert_eq!(&*c, "Hello");
@@ -166,16 +166,16 @@ mod internal {
 
 #[cfg(test)]
 mod feature_tests {
-    use super::DirtyConst;
+    use super::DirtyStatic;
 
     fn _assert_static() {
-        let c = DirtyConst::new(10);
+        let c = DirtyStatic::new(10);
         unsafe { c.replace(20) };
         assert_eq!(*c, 10);
     }
 
     fn _assert_dynamic() {
-        let c = DirtyConst::new(10);
+        let c = DirtyStatic::new(10);
         unsafe { c.replace(20) };
         assert_eq!(*c, 20);
     }
