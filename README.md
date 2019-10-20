@@ -1,5 +1,9 @@
 # dirty_const
 
+[![Build Status](https://travis-ci.org/mistodon/dirty_const.svg?branch=master)](https://travis-ci.org/mistodon/dirty_const)
+[![Crates.io](https://img.shields.io/crates/v/dirty_const.svg)](https://crates.io/crates/dirty_const)
+[![Docs.rs](https://docs.rs/resource/badge.svg)](https://docs.rs/dirty_const/0.1.0/dirty_const/)
+
 This crate provides a container for a value, `DirtyConst`, which
 allows mutation in debug mode (via `UnsafeCell`), but not in
 release mode.
