@@ -15,9 +15,9 @@ released.
 There are also two features available:
 
 1. `force-dynamic` which allows replacing the value of a
-    `` even in release mode.
+    `DirtyStatic` even in release mode.
 2. `force-static` which disallows replacing the value of a
-    `` even in debug mode.
+    `DirtyStatic` even in debug mode.
 
 ## Usage
 
