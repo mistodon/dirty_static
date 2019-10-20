@@ -1,4 +1,4 @@
-Language: rust
+language: rust
 cache: cargo
 matrix:
   include:
@@ -7,4 +7,3 @@ matrix:
         - rustup component add rustfmt
         - rustup component add clippy
       script: ./run_tests
-
