@@ -60,6 +60,19 @@ mod internal {
         /// this will do nothing unless running in debug mode, or
         /// enabling the `force-dynamic` feature.
         ///
+        /// # Safety
+        ///
+        /// When calling `replace`, any references to data inside the DirtyStatic
+        /// are invalidated. Accessing this data is undefined behaviour.
+        ///
+        /// For this reason, it's a good idea to only ever hold references to this
+        /// data between calls to replace. For example, if you replace the data
+        /// every frame, make sure you do not hold a reference across two frames.
+        ///
+        /// If you do need to reference data across this boundary, do so indirectly.
+        /// For example, store a HashMap in the DirtyStatic, and hold onto a key
+        /// instead of a reference.
+        ///
         /// # Examples
         ///
         /// ```rust,no_run
