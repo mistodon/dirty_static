@@ -149,9 +149,10 @@ mod internal {
             DirtyStatic(t)
         }
 
-        pub unsafe fn replace(&self, _t: T) {
-            eprintln!("WARNING: Can't replace in release mode!");
-        }
+        /// # Safety
+        ///
+        /// Only unsafe in debug mode. This does nothing in release mode.
+        pub unsafe fn replace(&self, _t: T) {}
     }
 
     #[cfg(test)]
