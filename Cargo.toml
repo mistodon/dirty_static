@@ -1,7 +1,7 @@
 [package]
 name = "dirty_static"
 version = "0.1.1"
-authors = ["***Realname*** ***Lastname*** <***redacted.email@redacted.nope***>"]
+authors = ["Vi <violet@hey.com>"]
 edition = "2018"
 description = """
 A container for an immutable value that allows sneaky reloading in debug mode (via UnsafeCell) while keeping the data safe and constant in release mode.
